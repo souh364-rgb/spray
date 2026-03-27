@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spray Anti-Taches — Commander</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Instrument+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #fafafa; --surface: #fff; --border: #e8e8e8;
+  --text: #111; --sub: #666; --ph: #aaa;
+  --accent: #111; --red: #c0392b; --radius: 8px; --t: .18s ease;
+}
+html { font-size: 15px; }
+body { background: var(--bg); color: var(--text); font-family: 'Instrument Sans', sans-serif; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+.shell { max-width: 520px; margin: 0 auto; padding: 52px 20px 80px; }
+
+/* Header */
+.header { margin-bottom: 36px; animation: up .4s ease both; }
+.eyebrow { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: var(--sub); margin-bottom: 10px; }
+.header h1 { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; letter-spacing: -.5px; line-height: 1.2; }
+.header h1 em { font-style: normal; color: var(--sub); font-weight: 400; }
+
+/* Section */
+.section { margin-bottom: 24px; animation: up .4s ease both; }
+.section:nth-child(2){animation-delay:.04s}.section:nth-child(3){animation-delay:.08s}
+.section:nth-child(4){animation-delay:.12s}.section:nth-child(5){animation-delay:.16s}
+.section:nth-child(6){animation-delay:.20s}.section:nth-child(7){animation-delay:.24s}
+
+.slabel { font-family: 'Syne', sans-serif; font-size: 10.5px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--sub); margin-bottom: 10px; }
+
+/* Fields */
+.field { position: relative; }
+.field + .field { margin-top: 10px; }
+.field input, .field select, .field textarea {
+  width: 100%; background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--radius); color: var(--text); font-family: 'Instrument Sans', sans-serif;
+  font-size: 14.5px; padding: 13px 16px; outline: none; transition: border-color var(--t);
+  -webkit-appearance: none; appearance: none;
+}
+.field input::placeholder, .field textarea::placeholder { color: var(--ph); }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--text); }
+.field input.err, .field select.err { border-color: var(--red); }
+.field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23aaa' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; cursor: pointer;
+}
+.field select:disabled { opacity: .4; cursor: not-allowed; }
+.field textarea { resize: none; height: 82px; line-height: 1.6; }
+.hint { font-size: 11px; color: var(--ph); margin-top: 5px; padding-left: 2px; }
+.ferr { display: none; font-size: 11.5px; color: var(--red); margin-top: 5px; }
+.ferr.show { display: block; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* Loading spinner */
+.loading-row { display: none; align-items: center; gap: 8px; font-size: 12px; color: var(--sub); margin-top: 6px; }
+.loading-row.show { display: flex; }
+.spin { width: 12px; height: 12px; border: 1.5px solid #ddd; border-top-color: var(--text); border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
+
+/* Format */
+.fmt-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.fmt-opt { position: relative; }
+.fmt-opt input { position: absolute; opacity: 0; width: 0; height: 0; }
+.fmt-box { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 16px 10px; border: 1.5px solid var(--border); border-radius: var(--radius); background: var(--surface); cursor: pointer; transition: border-color var(--t), background var(--t); text-align: center; }
+.fmt-opt input:checked + .fmt-box { border-color: var(--accent); background: #f4f4f4; }
+.fmt-size { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; }
+.fmt-price { font-size: 12px; color: var(--sub); }
+
+/* Delivery mode */
+.dlv-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.dlv-opt { position: relative; }
+.dlv-opt input { position: absolute; opacity: 0; width: 0; height: 0; }
+.dlv-box { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1.5px solid var(--border); border-radius: var(--radius); background: var(--surface); cursor: pointer; transition: border-color var(--t), background var(--t); }
+.dlv-opt input:checked + .dlv-box { border-color: var(--accent); background: #f4f4f4; }
+.dlv-dot { width: 16px; height: 16px; border: 1.5px solid var(--border); border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: border-color var(--t), background var(--t); }
+.dlv-opt input:checked + .dlv-box .dlv-dot { border-color: var(--accent); background: var(--accent); }
+.dlv-opt input:checked + .dlv-box .dlv-dot::after { content: ''; width: 5px; height: 5px; background: white; border-radius: 50%; }
+.dlv-info { flex: 1; }
+.dlv-info strong { display: block; font-family: 'Syne', sans-serif; font-size: 12.5px; font-weight: 600; }
+.dlv-sub { font-size: 11.5px; color: var(--sub); margin-top: 1px; }
+.dlv-price { font-size: 12px; color: var(--sub); margin-top: 2px; }
+
+/* Summary */
+.sum-grid { display: grid; grid-template-columns: repeat(4,1fr); border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.sum-cell { padding: 13px 14px; border-right: 1px solid var(--border); }
+.sum-cell:last-child { border-right: none; }
+.sl { font-size: 9.5px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--sub); margin-bottom: 4px; }
+.sv { font-family: 'Syne', sans-serif; font-size: 13.5px; font-weight: 600; }
+.total-bar { margin-top: 8px; background: var(--accent); border-radius: var(--radius); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+.tl { font-size: 11px; color: rgba(255,255,255,.5); letter-spacing: 1px; font-weight: 500; }
+.tl small { display: block; font-size: 10px; margin-top: 1px; }
+.ta { font-family: 'Syne', sans-serif; font-size: 19px; font-weight: 700; color: #fff; }
+
+/* Submit */
+.btn-submit { width: 100%; background: var(--accent); color: #fff; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; padding: 15px; border: none; border-radius: var(--radius); cursor: pointer; margin-top: 20px; transition: opacity var(--t), transform var(--t); }
+.btn-submit:hover { opacity: .85; }
+.btn-submit:active { transform: scale(.99); }
+.btn-submit:disabled { opacity: .6; cursor: not-allowed; }
+
+/* Toast */
+.toast { display: none; margin-top: 12px; padding: 14px 18px; border-radius: var(--radius); font-size: 13.5px; line-height: 1.6; }
+.toast.ok  { background: #f0fdf4; border: 1.5px solid #bbf7d0; color: #166534; }
+.toast.err { background: #fff1f2; border: 1.5px solid #fecdd3; color: #9f1239; }
+.toast.show { display: block; animation: up .3s ease both; }
+
+/* Success overlay */
+.overlay { display: none; position: fixed; inset: 0; z-index: 999; background: rgba(10,10,10,.95); backdrop-filter: blur(16px); align-items: center; justify-content: center; text-align: center; }
+.overlay.show { display: flex; }
+.overlay-box { max-width: 400px; padding: 2.5rem 2rem; }
+.o-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+.o-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: #fff; margin-bottom: .6rem; }
+.o-ref { font-size: 11px; color: rgba(255,255,255,.35); letter-spacing: 1px; margin-bottom: .8rem; }
+.o-msg { color: rgba(255,255,255,.6); font-size: 14px; line-height: 1.8; margin-bottom: .8rem; }
+.o-note { font-size: 12px; color: rgba(255,255,255,.35); border: 1px solid rgba(255,255,255,.1); padding: .7rem; margin-bottom: 1.5rem; border-radius: 6px; }
+.btn-close { padding: .8rem 2rem; background: #fff; color: #111; border: none; font-family: 'Syne', sans-serif; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; border-radius: 6px; font-weight: 600; }
+.btn-close:hover { background: #f0f0f0; }
+
+@keyframes up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 480px) {
+  .shell { padding: 36px 16px 60px; }
+  .row2 { grid-template-columns: 1fr; }
+  .sum-grid { grid-template-columns: repeat(2,1fr); }
+  .sum-cell:nth-child(2) { border-right: none; }
+  .sum-cell:nth-child(3) { border-top: 1px solid var(--border); }
+  .sum-cell:nth-child(4) { border-top: 1px solid var(--border); border-right: none; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="header">
+    <div class="eyebrow">Spray Anti-Taches</div>
+    <h1>Commander<br><em>Livraison partout en Algérie</em></h1>
+  </div>
+
+  <!-- Infos -->
+  <div class="section">
+    <div class="slabel">Vos informations</div>
+    <div class="row2">
+      <div class="field">
+        <input type="text" id="f-name" placeholder="Nom complet" autocomplete="name">
+        <div class="ferr" id="err-name">⚠ Nom complet requis</div>
+      </div>
+      <div class="field">
+        <input type="tel" id="f-phone" placeholder="0555 123 456" maxlength="12" oninput="fmtPhone(this)">
+        <div class="hint">10 chiffres · 05x / 06x / 07x</div>
+        <div class="ferr" id="err-phone">⚠ Numéro invalide</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Format -->
+  <div class="section">
+    <div class="slabel">Format</div>
+    <div class="fmt-row">
+      <label class="fmt-opt">
+        <input type="radio" name="format" value="100ml" data-price="500">
+        <div class="fmt-box"><span class="fmt-size">100 ml</span><span class="fmt-price">500 DA</span></div>
+      </label>
+      <label class="fmt-opt">
+        <input type="radio" name="format" value="500ml" data-price="1200" checked>
+        <div class="fmt-box"><span class="fmt-size">500 ml</span><span class="fmt-price">1 200 DA</span></div>
+      </label>
+      <label class="fmt-opt">
+        <input type="radio" name="format" value="1L" data-price="2000">
+        <div class="fmt-box"><span class="fmt-size">1 L</span><span class="fmt-price">2 000 DA</span></div>
+      </label>
+    </div>
+    <div class="ferr" id="err-format">⚠ Veuillez choisir un format</div>
+  </div>
+
+  <!-- Quantité -->
+  <div class="section">
+    <div class="slabel">Quantité</div>
+    <div class="field" style="max-width:160px">
+      <select id="f-qty" onchange="updateTotal()">
+        <option value="1">1 article</option>
+        <option value="2">2 articles</option>
+        <option value="3">3 articles</option>
+        <option value="4">4 articles</option>
+        <option value="5">5 articles</option>
+        <option value="10">10 articles</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Delivery mode -->
+  <div class="section">
+    <div class="slabel">Mode de livraison</div>
+    <div class="dlv-row">
+      <label class="dlv-opt">
+        <input type="radio" name="livraison" value="domicile" checked onchange="onModeChange()">
+        <div class="dlv-box">
+          <div class="dlv-dot"></div>
+          <div class="dlv-info">
+            <strong>🏠 Domicile</strong>
+            <div class="dlv-sub">Livraison chez vous</div>
+            <div class="dlv-price" id="p-dom">— DA</div>
+          </div>
+        </div>
+      </label>
+      <label class="dlv-opt">
+        <input type="radio" name="livraison" value="stopdesk" onchange="onModeChange()">
+        <div class="dlv-box">
+          <div class="dlv-dot"></div>
+          <div class="dlv-info">
+            <strong>🏪 Stop-Desk</strong>
+            <div class="dlv-sub">Agence GUEPEX</div>
+            <div class="dlv-price" id="p-stop">— DA</div>
+          </div>
+        </div>
+      </label>
+    </div>
+  </div>
+
+  <!-- Wilaya + Commune/Stopdesk -->
+  <div class="section">
+    <div class="slabel">Localisation</div>
+    <div class="field">
+      <select id="f-wilaya" onchange="onWilayaChange()">
+        <option value="">— Choisir une wilaya —</option>
+        <option value="Adrar" data-id="1">01 - Adrar</option>
+        <option value="Chlef" data-id="2">02 - Chlef</option>
+        <option value="Laghouat" data-id="3">03 - Laghouat</option>
+        <option value="Oum El Bouaghi" data-id="4">04 - Oum El Bouaghi</option>
+        <option value="Batna" data-id="5">05 - Batna</option>
+        <option value="Béjaïa" data-id="6">06 - Béjaïa</option>
+        <option value="Biskra" data-id="7">07 - Biskra</option>
+        <option value="Béchar" data-id="8">08 - Béchar</option>
+        <option value="Blida" data-id="9">09 - Blida</option>
+        <option value="Bouira" data-id="10">10 - Bouira</option>
+        <option value="Tamanrasset" data-id="11">11 - Tamanrasset</option>
+        <option value="Tébessa" data-id="12">12 - Tébessa</option>
+        <option value="Tlemcen" data-id="13">13 - Tlemcen</option>
+        <option value="Tiaret" data-id="14">14 - Tiaret</option>
+        <option value="Tizi Ouzou" data-id="15">15 - Tizi Ouzou</option>
+        <option value="Alger" data-id="16">16 - Alger</option>
+        <option value="Djelfa" data-id="17">17 - Djelfa</option>
+        <option value="Jijel" data-id="18">18 - Jijel</option>
+        <option value="Sétif" data-id="19">19 - Sétif</option>
+        <option value="Saïda" data-id="20">20 - Saïda</option>
+        <option value="Skikda" data-id="21">21 - Skikda</option>
+        <option value="Sidi Bel Abbès" data-id="22">22 - Sidi Bel Abbès</option>
+        <option value="Annaba" data-id="23">23 - Annaba</option>
+        <option value="Guelma" data-id="24">24 - Guelma</option>
+        <option value="Constantine" data-id="25">25 - Constantine</option>
+        <option value="Médéa" data-id="26">26 - Médéa</option>
+        <option value="Mostaganem" data-id="27">27 - Mostaganem</option>
+        <option value="M'Sila" data-id="28">28 - M'Sila</option>
+        <option value="Mascara" data-id="29">29 - Mascara</option>
+        <option value="Ouargla" data-id="30">30 - Ouargla</option>
+        <option value="Oran" data-id="31">31 - Oran</option>
+        <option value="El Bayadh" data-id="32">32 - El Bayadh</option>
+        <option value="Illizi" data-id="33">33 - Illizi</option>
+        <option value="Bordj Bou Arreridj" data-id="34">34 - Bordj Bou Arréridj</option>
+        <option value="Boumerdès" data-id="35">35 - Boumerdès</option>
+        <option value="El Tarf" data-id="36">36 - El Tarf</option>
+        <option value="Tindouf" data-id="37">37 - Tindouf</option>
+        <option value="Tissemsilt" data-id="38">38 - Tissemsilt</option>
+        <option value="El Oued" data-id="39">39 - El Oued</option>
+        <option value="Khenchela" data-id="40">40 - Khenchela</option>
+        <option value="Souk Ahras" data-id="41">41 - Souk Ahras</option>
+        <option value="Tipaza" data-id="42">42 - Tipaza</option>
+        <option value="Mila" data-id="43">43 - Mila</option>
+        <option value="Aïn Defla" data-id="44">44 - Aïn Defla</option>
+        <option value="Naâma" data-id="45">45 - Naâma</option>
+        <option value="Aïn Témouchent" data-id="46">46 - Aïn Témouchent</option>
+        <option value="Ghardaïa" data-id="47">47 - Ghardaïa</option>
+        <option value="Relizane" data-id="48">48 - Relizane</option>
+        <option value="El M'Ghair" data-id="49">49 - El M'Ghair</option>
+        <option value="El Menia" data-id="50">50 - El Meniaa</option>
+        <option value="Ouled Djellal" data-id="51">51 - Ouled Djellal</option>
+        <option value="Bordj Badji Mokhtar" data-id="52">52 - Bordj Badji Mokhtar</option>
+        <option value="Béni Abbès" data-id="53">53 - Béni Abbès</option>
+        <option value="Timimoun" data-id="54">54 - Timimoun</option>
+        <option value="Touggourt" data-id="55">55 - Touggourt</option>
+        <option value="Djanet" data-id="56">56 - Djanet</option>
+        <option value="In Salah" data-id="57">57 - In Salah</option>
+        <option value="In Guezzam" data-id="58">58 - In Guezzam</option>
+      </select>
+      <div class="ferr" id="err-wilaya">⚠ Veuillez sélectionner votre wilaya</div>
+    </div>
+
+    <!-- Commune (domicile) -->
+    <div id="commune-wrap" style="display:none; margin-top:10px;">
+      <div class="field">
+        <select id="f-commune" disabled onchange="onCommuneChange()">
+          <option value="">— Choisir la wilaya d'abord —</option>
+        </select>
+        <div class="loading-row" id="commune-loading"><div class="spin"></div><span>Chargement des communes...</span></div>
+        <div class="ferr" id="err-commune">⚠ Veuillez sélectionner votre commune</div>
+      </div>
+    </div>
+
+    <!-- Stop-desk -->
+    <div id="stopdesk-wrap" style="display:none; margin-top:10px;">
+      <div class="field">
+        <select id="f-stopdesk" disabled onchange="clearE('err-stopdesk','f-stopdesk')">
+          <option value="">— Choisir la wilaya d'abord —</option>
+        </select>
+        <div class="loading-row" id="stopdesk-loading"><div class="spin"></div><span>Chargement des agences...</span></div>
+        <div class="ferr" id="err-stopdesk">⚠ Veuillez sélectionner un bureau</div>
+      </div>
+    </div>
+
+    <!-- Address (domicile only) -->
+    <div id="address-wrap" style="display:none; margin-top:10px;">
+      <div class="field">
+        <input type="text" id="f-address" placeholder="Rue, numéro, résidence, quartier..." autocomplete="street-address">
+        <div class="ferr" id="err-address">⚠ Adresse complète requise</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="section">
+    <div class="slabel">Récapitulatif</div>
+    <div class="sum-grid">
+      <div class="sum-cell"><div class="sl">Articles</div><div class="sv" id="s-qte">1</div></div>
+      <div class="sum-cell"><div class="sl">Format</div><div class="sv" id="s-fmt">500 ml</div></div>
+      <div class="sum-cell"><div class="sl">Livraison</div><div class="sv" id="s-liv">— DA</div></div>
+      <div class="sum-cell"><div class="sl">Sous-total</div><div class="sv" id="s-sub">1 200 DA</div></div>
+    </div>
+    <div class="total-bar">
+      <div class="tl">TOTAL À PAYER<small>المبلغ الإجمالي</small></div>
+      <div class="ta" id="t-total">1 200 DA</div>
+    </div>
+  </div>
+
+  <!-- Note -->
+  <div class="section">
+    <div class="slabel">Note (optionnel)</div>
+    <div class="field">
+      <textarea id="f-note" placeholder="Remarques ou informations supplémentaires…"></textarea>
+    </div>
+  </div>
+
+  <button class="btn-submit" id="btnSubmit" onclick="submitOrder()">Confirmer la commande</button>
+  <div class="toast" id="toast"></div>
+
+</div>
+
+<!-- Success overlay -->
+<div class="overlay" id="overlay">
+  <div class="overlay-box">
+    <div class="o-icon">✅</div>
+    <div class="o-title">Commande Confirmée</div>
+    <div class="o-ref" id="o-ref"></div>
+    <div class="o-msg">Merci pour votre commande ! Nous vous contacterons très bientôt pour confirmer la livraison.</div>
+    <div class="o-note">💵 Paiement à la livraison — aucun paiement en ligne requis</div>
+    <button class="btn-close" onclick="closeOverlay()">Retour</button>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────
+//  CONFIG — fill these in
+// ─────────────────────────────────────────────────────────
+const GOOGLE_SHEET_URL = ''; // Your Google Apps Script URL
+const COMMUNE_API      = '/api/communes'; // Your deployed communes endpoint
+// ─────────────────────────────────────────────────────────
+
+const PRICES = { '100ml': 500, '500ml': 1200, '1L': 2000 };
+const LABELS = { '100ml': '100 ml', '500ml': '500 ml', '1L': '1 L' };
+
+// GUEPEX delivery prices by wilaya
+const WILAYA_PRICES = {
+  'Alger':               { domicile:590,  stopdesk:450  },
+  'Blida':               { domicile:700,  stopdesk:550  },
+  'Boumerdès':           { domicile:700,  stopdesk:550  },
+  'Tipaza':              { domicile:700,  stopdesk:550  },
+  'Chlef':               { domicile:900,  stopdesk:650  },
+  'Oum El Bouaghi':      { domicile:900,  stopdesk:650  },
+  'Batna':               { domicile:900,  stopdesk:650  },
+  'Béjaïa':              { domicile:900,  stopdesk:650  },
+  'Bouira':              { domicile:900,  stopdesk:650  },
+  'Tlemcen':             { domicile:900,  stopdesk:650  },
+  'Tiaret':              { domicile:900,  stopdesk:650  },
+  'Tizi Ouzou':          { domicile:900,  stopdesk:650  },
+  'Jijel':               { domicile:900,  stopdesk:650  },
+  'Sétif':               { domicile:900,  stopdesk:650  },
+  'Saïda':               { domicile:900,  stopdesk:650  },
+  'Skikda':              { domicile:900,  stopdesk:650  },
+  'Sidi Bel Abbès':      { domicile:900,  stopdesk:650  },
+  'Annaba':              { domicile:900,  stopdesk:650  },
+  'Guelma':              { domicile:900,  stopdesk:650  },
+  'Constantine':         { domicile:900,  stopdesk:650  },
+  'Médéa':               { domicile:900,  stopdesk:650  },
+  'Mostaganem':          { domicile:900,  stopdesk:650  },
+  "M'Sila":              { domicile:900,  stopdesk:650  },
+  'Mascara':             { domicile:900,  stopdesk:650  },
+  'Oran':                { domicile:900,  stopdesk:650  },
+  'Bordj Bou Arreridj':  { domicile:900,  stopdesk:650  },
+  'El Tarf':             { domicile:900,  stopdesk:650  },
+  'Tissemsilt':          { domicile:900,  stopdesk:650  },
+  'Khenchela':           { domicile:900,  stopdesk:650  },
+  'Souk Ahras':          { domicile:900,  stopdesk:650  },
+  'Mila':                { domicile:900,  stopdesk:650  },
+  'Aïn Defla':           { domicile:900,  stopdesk:650  },
+  'Aïn Témouchent':      { domicile:900,  stopdesk:650  },
+  'Relizane':            { domicile:900,  stopdesk:650  },
+  'Laghouat':            { domicile:950,  stopdesk:750  },
+  'Biskra':              { domicile:950,  stopdesk:750  },
+  'Tébessa':             { domicile:950,  stopdesk:750  },
+  'Djelfa':              { domicile:950,  stopdesk:750  },
+  'Ouargla':             { domicile:950,  stopdesk:750  },
+  'El Oued':             { domicile:950,  stopdesk:750  },
+  'Ghardaïa':            { domicile:950,  stopdesk:750  },
+  'Ouled Djellal':       { domicile:950,  stopdesk:750  },
+  'Touggourt':           { domicile:950,  stopdesk:750  },
+  "El M'Ghair":          { domicile:950,  stopdesk:750  },
+  'El Menia':            { domicile:950,  stopdesk:750  },
+  'Adrar':               { domicile:1050, stopdesk:850  },
+  'Béchar':              { domicile:1050, stopdesk:850  },
+  'El Bayadh':           { domicile:1050, stopdesk:850  },
+  'Naâma':               { domicile:1050, stopdesk:850  },
+  'Timimoun':            { domicile:1050, stopdesk:850  },
+  'Bordj Badji Mokhtar': { domicile:1050, stopdesk:850  },
+  'Béni Abbès':          { domicile:1050, stopdesk:850  },
+  'Tamanrasset':         { domicile:1600, stopdesk:1400 },
+  'Illizi':              { domicile:1600, stopdesk:1400 },
+  'Tindouf':             { domicile:1600, stopdesk:1400 },
+  'In Salah':            { domicile:1600, stopdesk:1400 },
+  'In Guezzam':          { domicile:1600, stopdesk:1400 },
+  'Djanet':              { domicile:1600, stopdesk:1400 },
+};
+
+let deliveryFee = 0;
+let communesCache = null;
+
+// ── Helpers ──────────────────────────────────────────────
+const da   = n => n == null ? '— DA' : n.toLocaleString('fr-DZ') + ' DA';
+const $    = id => document.getElementById(id);
+const show = id => { const e=$(id); if(e) e.style.display=''; };
+const hide = id => { const e=$(id); if(e) e.style.display='none'; };
+const cleanPhone = v => v.replace(/\D/g,'');
+
+function showE(id, inputId) { $(id)?.classList.add('show'); if(inputId) $(inputId)?.classList.add('err'); }
+function clearE(id, inputId) { $(id)?.classList.remove('show'); if(inputId) $(inputId)?.classList.remove('err'); }
+function isValidPhone(v) { const d=cleanPhone(v); return d.length===10 && /^0[5-7]/.test(d); }
+
+function fmtPhone(input) {
+  const d = cleanPhone(input.value).slice(0,10);
+  let out = d;
+  if(d.length>4&&d.length<=7) out = d.slice(0,4)+' '+d.slice(4);
+  else if(d.length>7) out = d.slice(0,4)+' '+d.slice(4,7)+' '+d.slice(7);
+  input.value = out;
+}
+
+// ── Pricing ──────────────────────────────────────────────
+function getFormat() {
+  return document.querySelector('input[name="format"]:checked')?.value || '500ml';
+}
+function getMode() {
+  return document.querySelector('input[name="livraison"]:checked')?.value || 'domicile';
+}
+
+function refreshDeliveryPrices() {
+  const wilaya = $('f-wilaya').value;
+  const r = WILAYA_PRICES[wilaya];
+  $('p-dom').textContent  = r ? da(r.domicile)  : '— DA';
+  $('p-stop').textContent = r ? da(r.stopdesk) : '— DA';
+  if(r) deliveryFee = getMode()==='domicile' ? r.domicile : r.stopdesk;
+  else  deliveryFee = 0;
+}
+
+function updateTotal() {
+  const fmt = getFormat();
+  const qte = parseInt($('f-qty').value) || 1;
+  refreshDeliveryPrices();
+  const sub   = PRICES[fmt] * qte;
+  const total = deliveryFee ? sub + deliveryFee : sub;
+  $('s-qte').textContent = qte;
+  $('s-fmt').textContent = LABELS[fmt];
+  $('s-liv').textContent = deliveryFee ? da(deliveryFee) : '— DA';
+  $('s-sub').textContent = da(sub);
+  $('t-total').textContent = da(total);
+}
+
+document.querySelectorAll('input[name="format"]').forEach(r => r.addEventListener('change', updateTotal));
+updateTotal();
+
+// ── Delivery mode toggle ──────────────────────────────────
+function onModeChange() {
+  const wilaya = $('f-wilaya').value;
+  const wId = $('f-wilaya').selectedOptions[0]?.dataset.id;
+  const mode = getMode();
+
+  // reset downstream
+  $('f-commune').innerHTML = "<option value=''>— Choisir la wilaya d'abord —</option>";
+  $('f-commune').disabled = true;
+  $('f-stopdesk').innerHTML = "<option value=''>— Choisir la wilaya d'abord —</option>";
+  $('f-stopdesk').disabled = true;
+  hide('commune-wrap'); hide('stopdesk-wrap'); hide('address-wrap');
+  updateTotal();
+
+  if(!wId) return;
+  if(mode === 'domicile') { show('commune-wrap'); loadCommunes(wId); }
+  else                    { show('stopdesk-wrap'); loadStopdesks(wId); }
+}
+
+// ── Wilaya change ─────────────────────────────────────────
+function onWilayaChange() {
+  clearE('err-wilaya','f-wilaya');
+  $('f-commune').innerHTML = "<option value=''>— Choisir la wilaya d'abord —</option>";
+  $('f-commune').disabled = true;
+  $('f-stopdesk').innerHTML = "<option value=''>— Choisir la wilaya d'abord —</option>";
+  $('f-stopdesk').disabled = true;
+  hide('commune-wrap'); hide('stopdesk-wrap'); hide('address-wrap');
+  updateTotal();
+
+  const wId = $('f-wilaya').selectedOptions[0]?.dataset.id;
+  if(!wId) return;
+  const mode = getMode();
+  if(mode === 'domicile') { show('commune-wrap'); loadCommunes(wId); }
+  else                    { show('stopdesk-wrap'); loadStopdesks(wId); }
+}
+
+function onCommuneChange() {
+  clearE('err-commune','f-commune');
+  hide('address-wrap');
+  if($('f-commune').value) show('address-wrap');
+}
+
+// ── Fetch communes from GUEPEX API ────────────────────────
+const COMMUNE_SOURCES = [
+  COMMUNE_API,
+  'https://onlinejacket.vercel.app/api/communes',
+];
+
+async function fetchCommunes() {
+  for(const url of COMMUNE_SOURCES) {
+    try {
+      const res = await fetch(url);
+      if(!res.ok) continue;
+      const data = await res.json();
+      const list = data.communes || data;
+      if(Array.isArray(list) && list.length > 0) return list;
+    } catch(e) { continue; }
+  }
+  return null;
+}
+
+async function loadCommunes(wilayaId) {
+  const sel = $('f-commune'), loading = $('commune-loading');
+  sel.disabled = true;
+  sel.innerHTML = '<option value="">Chargement...</option>';
+  loading.classList.add('show');
+  try {
+    if(!communesCache) { const list = await fetchCommunes(); if(list) communesCache = list; }
+    const filtered = (communesCache||[])
+      .filter(c => String(c.wilaya_id) === String(wilayaId))
+      .sort((a,b) => a.name.localeCompare(b.name));
+    if(filtered.length === 0) {
+      sel.innerHTML = '<option value="">Aucune commune disponible</option>';
+    } else {
+      sel.innerHTML = '<option value="">— Choisir une commune —</option>';
+      filtered.forEach(c => { const o = document.createElement('option'); o.value = c.name; o.textContent = c.name; sel.appendChild(o); });
+      sel.disabled = false;
+    }
+  } catch(e) {
+    sel.innerHTML = '<option value="">Erreur — réessayez</option>';
+    sel.disabled = false;
+  }
+  loading.classList.remove('show');
+}
+
+async function loadStopdesks(wilayaId) {
+  const sel = $('f-stopdesk'), loading = $('stopdesk-loading');
+  sel.disabled = true;
+  sel.innerHTML = '<option value="">Chargement...</option>';
+  loading.classList.add('show');
+  try {
+    if(!communesCache) { const list = await fetchCommunes(); if(list) communesCache = list; }
+    const offices = (communesCache||[])
+      .filter(c => String(c.wilaya_id) === String(wilayaId) && c.has_stop_desk)
+      .sort((a,b) => a.name.localeCompare(b.name));
+    if(offices.length === 0) {
+      sel.innerHTML = '<option value="">Aucun bureau dans cette wilaya</option>';
+    } else {
+      sel.innerHTML = '<option value="">— Choisir un bureau —</option>';
+      offices.forEach(c => { const o = document.createElement('option'); o.value = c.name; o.textContent = c.name; sel.appendChild(o); });
+      sel.disabled = false;
+    }
+  } catch(e) {
+    sel.innerHTML = '<option value="">Erreur — réessayez</option>';
+    sel.disabled = false;
+  }
+  loading.classList.remove('show');
+}
+
+// Prefetch communes on page load
+(async () => { try { const list = await fetchCommunes(); if(list) communesCache = list; } catch(e){} })();
+
+// ── Toast ─────────────────────────────────────────────────
+function showToast(msg, type) {
+  const t = $('toast');
+  t.innerHTML = msg; t.className = 'toast ' + type + ' show';
+  setTimeout(() => t.classList.remove('show'), 6000);
+}
+
+// ── Submit ────────────────────────────────────────────────
+async function submitOrder() {
+  const name   = $('f-name').value.trim();
+  const phone  = $('f-phone').value;
+  const wilaya = $('f-wilaya').value;
+  const mode   = getMode();
+  const commune  = mode === 'domicile' ? $('f-commune').value  : $('f-stopdesk').value;
+  const address  = $('f-address').value.trim();
+
+  let ok = true;
+  if(name.length < 2)       { showE('err-name','f-name');       ok=false; } else clearE('err-name','f-name');
+  if(!isValidPhone(phone))  { showE('err-phone','f-phone');     ok=false; } else clearE('err-phone','f-phone');
+  if(!wilaya)               { showE('err-wilaya','f-wilaya');   ok=false; } else clearE('err-wilaya','f-wilaya');
+  if(mode==='domicile') {
+    if(!commune)            { showE('err-commune','f-commune'); ok=false; } else clearE('err-commune','f-commune');
+    if(address.length < 5)  { showE('err-address','f-address'); ok=false; } else clearE('err-address','f-address');
+  } else {
+    if(!commune)            { showE('err-stopdesk','f-stopdesk'); ok=false; } else clearE('err-stopdesk','f-stopdesk');
+  }
+  if(!ok) { document.querySelector('.ferr.show')?.scrollIntoView({behavior:'smooth',block:'center'}); return; }
+
+  const fmt  = getFormat();
+  const qte  = parseInt($('f-qty').value);
+  const sub  = PRICES[fmt] * qte;
+  const total = deliveryFee ? sub + deliveryFee : sub;
+  const ref   = 'SP-' + Date.now().toString().slice(-6);
+  const note  = $('f-note').value.trim();
+
+  const payload = {
+    timestamp:       new Date().toLocaleString('fr-DZ'),
+    ref,
+    nom:             name,
+    telephone:       cleanPhone(phone),
+    wilaya,
+    commune,
+    adresse:         mode === 'domicile' ? address : '—',
+    mode_livraison:  mode === 'domicile' ? 'Domicile' : 'Stop-Desk GUEPEX',
+    format:          LABELS[fmt],
+    quantite:        qte,
+    prix_unitaire:   da(PRICES[fmt]),
+    frais_livraison: da(deliveryFee),
+    total:           da(total),
+    note:            note || '—',
+    statut:          'Pending',
+  };
+
+  const btn = $('btnSubmit');
+  btn.disabled = true;
+  btn.textContent = 'Envoi en cours…';
+
+  let sent = false;
+  if(GOOGLE_SHEET_URL) {
+    try {
+      await fetch(GOOGLE_SHEET_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(payload) });
+      sent = true;
+    } catch(e) {}
+  } else {
+    // No sheet configured — still show success (useful for testing)
+    sent = true;
+  }
+
+  if(!sent) {
+    showToast('❌ Erreur réseau. Vérifiez votre connexion et réessayez.', 'err');
+    btn.disabled = false; btn.textContent = 'Confirmer la commande'; return;
+  }
+
+  // Show success overlay
+  $('o-ref').textContent = 'Référence : #' + ref;
+  $('overlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+
+  // Reset
+  $('f-name').value = ''; $('f-phone').value = ''; $('f-wilaya').value = '';
+  $('f-commune').innerHTML = "<option value=''>— Choisir la wilaya d'abord —</option>"; $('f-commune').disabled = true;
+  $('f-stopdesk').innerHTML = "<option value=''>— Choisir la wilaya d'abord —</option>"; $('f-stopdesk').disabled = true;
+  $('f-address').value = ''; $('f-note').value = ''; $('f-qty').value = '1';
+  document.querySelector('input[name="format"][value="500ml"]').checked = true;
+  document.querySelector('input[name="livraison"][value="domicile"]').checked = true;
+  hide('commune-wrap'); hide('stopdesk-wrap'); hide('address-wrap');
+  deliveryFee = 0; updateTotal();
+
+  btn.disabled = false; btn.textContent = 'Confirmer la commande';
+}
+
+function closeOverlay() {
+  $('overlay').classList.remove('show');
+  document.body.style.overflow = '';
+}
+</script>
+</body>
+</html>
