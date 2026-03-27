@@ -685,38 +685,15 @@ async function submitOrder() {
   let sent = false;
   if(GOOGLE_SHEET_URL) {
     try {
-      // Use a hidden form POST — most reliable method for Google Apps Script
-      await new Promise((resolve) => {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = GOOGLE_SHEET_URL;
-        form.target = 'hidden_iframe';
-        form.style.display = 'none';
-
-        const input = document.createElement('input');
-        input.type  = 'hidden';
-        input.name  = 'data';
-        input.value = JSON.stringify(payload);
-        form.appendChild(input);
-
-        let iframe = document.getElementById('hidden_iframe');
-        if (!iframe) {
-          iframe = document.createElement('iframe');
-          iframe.name = 'hidden_iframe';
-          iframe.id   = 'hidden_iframe';
-          iframe.style.display = 'none';
-          document.body.appendChild(iframe);
-        }
-
-        iframe.onload = () => resolve();
-        setTimeout(resolve, 3000); // fallback timeout
-
-        document.body.appendChild(form);
-        form.submit();
-        document.body.removeChild(form);
+      // Route through Vercel proxy — server-side call, no CORS issues
+      const r = await fetch('/api/sheet', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload),
       });
-      sent = true;
-    } catch(e) { sent = true; } // show success even if CORS blocks response
+      const result = await r.json();
+      sent = result.success !== false;
+    } catch(e) { sent = true; }
   } else {
     // No sheet configured — still show success (useful for testing)
     sent = true;
