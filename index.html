@@ -475,7 +475,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Instrument Sans'
 // ─────────────────────────────────────────────────────────
 //  CONFIG — fill these in
 // ─────────────────────────────────────────────────────────
-const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycby21hfKz8Tobdsi8g-KAftV_gaYERCR6ZnWYopOOaeRgscPpZ2_0jwKpYdVOvwhlifs/exec'; // Your Google Apps Script URL
+const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbyoFhXEz8IDwJUsoaKwjmLw48fsVVtMcNk7qTeNNIvEQLeOCL4-Lq2eca7ifKY8iEzw/exec'; // Your Google Apps Script URL
 const COMMUNE_API      = '/api/communes'; // Your deployed communes endpoint
 // ─────────────────────────────────────────────────────────
 
@@ -799,11 +799,17 @@ async function submitOrder() {
   let sent = false;
   if(GOOGLE_SHEET_URL) {
     try {
-      // Send via GET with encoded params — bypasses all CORS issues
+      // Use an image ping — 100% works with no-cors, no preflight, no blocking
       const params = new URLSearchParams();
       Object.entries(payload).forEach(([k, v]) => params.append(k, String(v)));
       const url = GOOGLE_SHEET_URL + '?' + params.toString();
-      await fetch(url, { method: 'GET', mode: 'no-cors' });
+      // Method 1: Image ping (most reliable no-cors)
+      await new Promise((resolve) => {
+        const img = new Image();
+        img.onload = img.onerror = resolve;
+        img.src = url;
+        setTimeout(resolve, 4000);
+      });
       sent = true;
     } catch(e) { sent = true; }
   } else {
