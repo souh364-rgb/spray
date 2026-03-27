@@ -654,6 +654,34 @@ async function submitOrder() {
   btn.disabled = true;
   btn.textContent = 'Envoi en cours…';
 
+  // ─── Web3Forms email backup ───────────────────────────────
+  const WEB3FORMS_KEY = '1612c9b1-bb22-4ba3-a01a-3d052ba3bfac';
+  try {
+    const fd = new FormData();
+    fd.append('access_key', WEB3FORMS_KEY);
+    fd.append('subject',    `Nouvelle commande #${payload.ref} — Spray Anti-Taches`);
+    fd.append('from_name',  'Spray Anti-Taches');
+    fd.append('name',       payload.nom);
+    fd.append('email',      'noreply@spray.dz');
+    fd.append('message',
+      `NOUVELLE COMMANDE #${payload.ref}\n\n` +
+      `Nom       : ${payload.nom}\n` +
+      `Téléphone : ${payload.telephone}\n` +
+      `Wilaya    : ${payload.wilaya}\n` +
+      `Commune   : ${payload.commune}\n` +
+      `Adresse   : ${payload.adresse}\n` +
+      `Mode      : ${payload.mode_livraison}\n\n` +
+      `Format    : ${payload.format}\n` +
+      `Quantité  : ${payload.quantite}\n` +
+      `Livraison : ${payload.frais_livraison}\n` +
+      `Total     : ${payload.total}\n\n` +
+      `Note      : ${payload.note}\n` +
+      `Date      : ${payload.timestamp}`
+    );
+    await fetch('https://api.web3forms.com/submit', { method: 'POST', body: fd });
+  } catch(e) {}
+  // ─────────────────────────────────────────────────────────
+
   let sent = false;
   if(GOOGLE_SHEET_URL) {
     try {
