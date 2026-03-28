@@ -1,4 +1,4 @@
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwS3C3dQl7AsCIh_kAluIn2avJt3mzF_Vhv2KNp8TVYjvXvDme24BGU_aUTuJqvjJXX/exec';
+export const config = { api: { bodyParser: true } };
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -8,33 +8,20 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  try {
-    // Safely stringify whatever Vercel gives us
-    let body;
-    if (typeof req.body === 'string') {
-      body = req.body;
-    } else if (req.body && typeof req.body === 'object') {
-      body = JSON.stringify(req.body);
-    } else {
-      body = '{}';
-    }
+  const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyoFhXEz8IDwJUsoaKwjmLw48fsVVtMcNk7qTeNNIvEQLeOCL4-Lq2eca7ifKY8iEzw/exec';
 
-    // Forward to Google Apps Script
-    const gRes = await fetch(SHEET_URL, {
-      method:  'POST',
+  try {
+    const body = JSON.stringify(req.body);
+
+    const response = await fetch(SHEET_URL, {
+      method: 'POST',
       headers: { 'Content-Type': 'text/plain' },
-      body:    body,
+      body: body,
+      redirect: 'follow',
     });
 
-    // Google Apps Script always returns 200 even on error
-    const text = await gRes.text();
-
-    let parsed;
-    try { parsed = JSON.parse(text); } catch(_) { parsed = { raw: text }; }
-
-    return res.status(200).json({ ok: true, google: parsed });
-
+    return res.status(200).json({ success: true });
   } catch (err) {
-    return res.status(200).json({ ok: false, error: err.message });
+    return res.status(200).json({ success: false, error: err.message });
   }
 }
