@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Spray Anti-Taches — Commander</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Instrument+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -24,6 +24,22 @@
   --t: .18s ease;
 }
 html { font-size: 15px; }
+
+/* Safe area for iPhone notch/home bar */
+body {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Prevent iOS font size adjustment */
+* { -webkit-text-size-adjust: 100%; }
+
+/* Prevent iOS zoom on focus — all inputs must be 16px+ on mobile */
+@media (max-width: 600px) {
+  select, textarea, input[type="text"], input[type="tel"] {
+    font-size: 16px !important;
+  }
+}
+
 body { background: var(--bg); color: var(--text); font-family: 'Instrument Sans', sans-serif; min-height: 100vh; -webkit-font-smoothing: antialiased; }
 
 .shell { max-width: 520px; margin: 0 auto; padding: 52px 20px 80px; }
@@ -131,13 +147,91 @@ body { background: var(--bg); color: var(--text); font-family: 'Instrument Sans'
 @keyframes up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-@media (max-width: 480px) {
-  .shell { padding: 36px 16px 60px; }
-  .row2 { grid-template-columns: 1fr; }
+/* ── Mobile-first improvements ── */
+@media (max-width: 600px) {
+  html { font-size: 14px; }
+
+  .shell { padding: 24px 16px 100px; }
+
+  /* Header */
+  .header { margin-bottom: 24px; }
+  .header h1 { font-size: 24px; }
+
+  /* All inputs bigger tap targets */
+  .field input,
+  .field select,
+  .field textarea {
+    font-size: 16px; /* prevents iOS zoom */
+    padding: 14px 16px;
+    border-radius: 10px;
+  }
+
+  /* Stack name + phone vertically */
+  .row2 { grid-template-columns: 1fr; gap: 12px; }
+
+  /* Format cards — full width on tiny screens */
+  .fmt-row { gap: 8px; }
+  .fmt-box { padding: 14px 8px; }
+  .fmt-size { font-size: 15px; }
+
+  /* Delivery options stack */
+  .dlv-row { grid-template-columns: 1fr; gap: 8px; }
+  .dlv-box { padding: 14px 14px; }
+
+  /* Summary grid 2x2 */
   .sum-grid { grid-template-columns: repeat(2,1fr); }
+  .sum-cell { padding: 12px 12px; }
   .sum-cell:nth-child(2) { border-right: none; }
   .sum-cell:nth-child(3) { border-top: 1px solid var(--border); }
   .sum-cell:nth-child(4) { border-top: 1px solid var(--border); border-right: none; }
+  .sv { font-size: 13px; }
+
+  /* Total bar */
+  .total-bar { padding: 14px 16px; border-radius: 10px; }
+  .ta { font-size: 18px; }
+  .tl { font-size: 10px; }
+
+  /* Big CTA button */
+  .btn-submit {
+    padding: 18px;
+    font-size: 14px;
+    border-radius: 12px;
+    margin-top: 16px;
+    position: sticky;
+    bottom: 16px;
+    box-shadow: 0 8px 32px rgba(245,158,11,0.5);
+    z-index: 10;
+  }
+
+  /* Sections spacing */
+  .section { margin-bottom: 20px; }
+
+  /* Toast */
+  .toast { font-size: 13px; padding: 12px 14px; border-radius: 10px; }
+
+  /* Overlay */
+  .overlay-box { padding: 2rem 1.4rem; max-width: 100%; }
+  .o-title { font-size: 20px; }
+  .o-msg { font-size: 13px; }
+
+  /* Reviews */
+  .reviews-section { padding: 36px 0 4px; }
+  .rcard { width: 260px; padding: 14px; }
+  .rcard-text { font-size: 12.5px; }
+
+  /* FAQ */
+  .faq-section { padding: 28px 0 40px; }
+  .faq-list { padding: 0 16px; }
+  .faq-btn { font-size: 13px; padding: 13px 14px; }
+  .faq-panel-inner { font-size: 13px; padding: 0 14px 12px; }
+}
+
+/* Extra small phones */
+@media (max-width: 360px) {
+  .fmt-row { grid-template-columns: repeat(3,1fr); }
+  .fmt-size { font-size: 13px; }
+  .fmt-price { font-size: 11px; }
+  .header h1 { font-size: 21px; }
 }
 </style>
 </head>
