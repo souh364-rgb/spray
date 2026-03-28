@@ -810,10 +810,10 @@ async function submitOrder() {
   let sent = false;
   if(GOOGLE_SHEET_URL) {
     try {
-      await fetch(GOOGLE_SHEET_URL, {
+      // Send through Vercel proxy — server-side, never blocked by browser
+      await fetch('/api/sheet', {
         method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
       sent = true;
