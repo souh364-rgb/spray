@@ -11,7 +11,7 @@ export default async function handler(req, res) {
   const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyoFhXEz8IDwJUsoaKwjmLw48fsVVtMcNk7qTeNNIvEQLeOCL4-Lq2eca7ifKY8iEzw/exec';
 
   try {
-    const body = JSON.stringify(req.body);
+    const body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
 
     const response = await fetch(SHEET_URL, {
       method: 'POST',
@@ -20,8 +20,12 @@ export default async function handler(req, res) {
       redirect: 'follow',
     });
 
-    return res.status(200).json({ success: true });
+    const text = await response.text();
+    console.log('Google response:', response.status, text.slice(0, 200));
+
+    return res.status(200).json({ success: true, status: response.status, google: text.slice(0, 200) });
   } catch (err) {
+    console.error('sheet.js error:', err.message);
     return res.status(200).json({ success: false, error: err.message });
   }
 }
