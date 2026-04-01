@@ -534,9 +534,9 @@ textarea.cm-inp { resize: vertical; min-height: 80px; line-height: 1.5; }
     <div class="promo-msg" id="promo-msg"></div>
   </div>
 
-  <!-- 5. Mode livraison -->
+  <!-- 5. Livraison + Localisation -->
   <div class="card">
-    <div class="card-label">Mode de livraison</div>
+    <div class="card-label">Livraison</div>
     <div class="dlv-grid">
       <label class="dlv-opt">
         <input type="radio" name="dlv" value="domicile" checked onchange="onModeChange()">
@@ -561,10 +561,8 @@ textarea.cm-inp { resize: vertical; min-height: 80px; line-height: 1.5; }
         </div>
       </label>
     </div>
-  </div>
 
-  <!-- 6. Localisation -->
-  <div class="card">
+    <div style="margin-top:16px;">
     <div class="card-label">Localisation</div>
     <div class="inp-group">
       <label>Wilaya</label>
@@ -596,7 +594,8 @@ textarea.cm-inp { resize: vertical; min-height: 80px; line-height: 1.5; }
         <div class="err-msg" id="e-stopdesk">⚠ Sélectionnez un bureau</div>
       </div>
     </div>
-  </div>
+    </div><!-- /inner wrap -->
+  </div><!-- /card -->
 
   <!-- 7. Récap -->
   <div class="card">
